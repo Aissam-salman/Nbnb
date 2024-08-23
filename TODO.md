@@ -15,20 +15,20 @@
   PostgreSQL, Spring Security).
 - [x] Configurer le fichier `application.properties` ou `application.yml` pour se connecter à la base de données 
   PostgreSQL.
-- [ ] Initialiser un dépôt Git et pousser le projet sur GitHub ou GitLab.
+- [x] Initialiser un dépôt Git et pousser le projet sur GitHub ou GitLab.
 
 ### 1.3 Initialisation du frontend (ReactJS)
-- [ ] Créer un projet ReactJS avec `create-react-app`.
-- [ ] Configurer les répertoires (`src`, `components`, `services`, etc.).
-- [ ] Installer les dépendances nécessaires (Axios, React Router, etc.).
-- [ ] Initialiser un dépôt Git et pousser le projet sur GitHub ou GitLab.
+- [x] Créer un projet ReactJS avec `create-react-app`.
+- [x] Configurer les répertoires (`src`, `components`, `services`, etc.).
+- [x] Installer les dépendances nécessaires (Axios, React Router, etc.).
+- [x] Initialiser un dépôt Git et pousser le projet sur GitHub ou GitLab.
 
 ## 2. Conception de la Base de Données
 
 ### 2.1 Modélisation des entités
-- [ ] Créer un diagramme ERD (Entity-Relationship Diagram) pour les entités principales (Utilisateur, Propriétaire, Locataire, Logement, Réservation, Paiement).
-- [ ] Définir les relations entre les entités.
-- [ ] Ajouter des contraintes et des clés étrangères.
+- [x] Créer un diagramme ERD (Entity-Relationship Diagram) pour les entités principales (Utilisateur, Propriétaire, Locataire, Logement, Réservation, Paiement).
+- [x] Définir les relations entre les entités.
+- [x] Ajouter des contraintes et des clés étrangères.
 
 ### 2.2 Implémentation de la base de données
 - [ ] Créer les entités JPA correspondantes dans Spring Boot.

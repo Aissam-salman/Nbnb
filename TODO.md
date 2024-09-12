@@ -48,11 +48,13 @@
 - [x] Implémenter l'enregistrement des utilisateurs (Propriétaire, Locataire, Administrateur).
 - [x] Implémenter l'authentification avec Spring Security (JWT).
 - [ ] Implémenter la gestion des rôles et permissions.
+- [ ] test
 
 ### 3.2 Gestion des logements
 
-- [ ] Implémenter la création, modification, suppression des logements.
-- [ ] Implémenter la gestion de la disponibilité des logements.
+- [x] Implémenter la création, modification, suppression des logements.
+- [x] Implémenter la gestion de la disponibilité des logements.
+- [ ] test
 
 ### 3.3 Gestion des réservations
 

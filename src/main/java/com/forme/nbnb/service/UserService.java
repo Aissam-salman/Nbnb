@@ -30,6 +30,7 @@ public class UserService {
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .email(user.getEmail())
+                //TODO: hash password
                 .password(user.getPassword())
                 .picture(user.getPicture() != null ? user.getPicture() : null)
                 .oauth2Provider(user.getOauth2Provider() != null ? user.getOauth2Provider() : null)

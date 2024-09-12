@@ -6,6 +6,7 @@ import com.forme.nbnb.entity.user.Role;
 import com.forme.nbnb.entity.user.Tenant;
 import com.forme.nbnb.entity.user.User;
 import com.forme.nbnb.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,14 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
 
     @GetMapping("/user-info")
     @ResponseBody
@@ -77,10 +73,21 @@ public class UserController {
         User user = userService.getByEmail(req.getEmail());
         if (user == null) {
             User newUser = userService.createUserClassic(req);
-            if (newUser != null) return ResponseEntity.ok().body(newUser);
+            if (newUser != null) return ResponseEntity.ok(newUser);
 
         }
         return ResponseEntity.badRequest().body("User already exists");
+    }
+
+    @PostMapping("/login")
+    @ResponseBody
+    public ResponseEntity<?> login(@AuthenticationPrincipal @RequestBody UserDetails req) {
+        User user = userService.getByEmail(req.getUsername());
+        //TODO: need decrypt password before compare && add limit request for this route
+        if (user != null && req.getPassword().equals(user.getPassword())) {
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

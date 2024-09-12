@@ -83,11 +83,9 @@ public class HomeServiceImpl implements IHome {
         return List.of();
     }
 
-
     public List<Home> findByOwnerId(Long ownerId) {
         return List.of();
     }
-
 
     public boolean delete(Long homeId) {
         try {

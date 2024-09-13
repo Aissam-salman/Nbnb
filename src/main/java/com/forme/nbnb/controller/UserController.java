@@ -1,14 +1,19 @@
 package com.forme.nbnb.controller;
 
+import com.forme.nbnb.dto.LoginRequest;
+import com.forme.nbnb.dto.LoginResponse;
 import com.forme.nbnb.dto.RegisterDto;
 import com.forme.nbnb.entity.Provider;
 import com.forme.nbnb.entity.user.Role;
-import com.forme.nbnb.entity.user.Tenant;
 import com.forme.nbnb.entity.user.User;
-import com.forme.nbnb.service.UserService;
+import com.forme.nbnb.security.token.JwtService;
+import com.forme.nbnb.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +23,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final UserDetailsServiceImpl userService;
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @GetMapping("/user-info")
     @ResponseBody
@@ -40,7 +48,7 @@ public class UserController {
             String picture = oauth2User.getAttribute("picture") != null ? oauth2User.getAttribute("picture") : null;
 
 
-            User newUser = Tenant.builder()
+            User newUser = User.builder()
                     .firstname(firstname)
                     .lastname(lastname)
                     .email(email)
@@ -55,12 +63,11 @@ public class UserController {
             return ResponseEntity.ok(newUser);
 
         } else if (principal instanceof UserDetails userDetails) {
-            User user = userService.getByEmail(userDetails.getUsername());
-            if (user != null) {
-                return ResponseEntity.ok(user);
-            }
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            return ResponseEntity.notFound().build();
+            User currentUser = (User) authentication.getPrincipal();
+
+            return ResponseEntity.ok(currentUser);
         }
 
         return ResponseEntity.notFound().build();
@@ -81,13 +88,12 @@ public class UserController {
 
     @PostMapping("/login")
     @ResponseBody
-    public ResponseEntity<?> login(@AuthenticationPrincipal @RequestBody UserDetails req) {
-        User user = userService.getByEmail(req.getUsername());
-        //TODO: need decrypt password before compare && add limit request for this route
-        if (user != null && req.getPassword().equals(user.getPassword())) {
-            return ResponseEntity.ok(user);
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        User authenticatedUser = userService.authenticate(loginRequest);
+        String jwtToken = jwtService.generateToken(authenticatedUser);
+        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getJwtExpirationTime());
+
+        return ResponseEntity.ok(loginResponse);
     }
 
 }

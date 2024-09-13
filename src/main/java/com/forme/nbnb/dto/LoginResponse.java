@@ -1,6 +1,5 @@
 package com.forme.nbnb.dto;
 
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
-    @Email
-    private String email;
-    private String password;
+public class LoginResponse {
+    private String token;
+    private Long expiresIn;
 }

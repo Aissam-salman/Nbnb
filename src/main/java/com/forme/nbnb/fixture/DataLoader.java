@@ -1,7 +1,7 @@
 package com.forme.nbnb.fixture;
 
 import com.forme.nbnb.dto.RegisterDto;
-import com.forme.nbnb.service.UserService;
+import com.forme.nbnb.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
-    private final UserService userService;
+    private final UserDetailsServiceImpl userService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -20,7 +20,7 @@ public class DataLoader implements CommandLineRunner {
         registerDto.setFirstname("test");
         registerDto.setLastname("test1");
         registerDto.setEmail("test@test.com");
-        registerDto.setPassword("123456");
+        registerDto.setPassword("secret");
         registerDto.setPicture("test.png");
 
         userService.createUserClassic(registerDto);

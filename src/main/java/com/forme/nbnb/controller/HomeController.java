@@ -1,8 +1,10 @@
 package com.forme.nbnb.controller;
 
 import com.forme.nbnb.dto.CreateHomeDto;
+import com.forme.nbnb.dto.HomeDto;
 import com.forme.nbnb.dto.UpdateHomeDto;
 import com.forme.nbnb.entity.Home;
+import com.forme.nbnb.mapper.MapperDTO;
 import com.forme.nbnb.service.HomeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,22 +19,27 @@ public class HomeController {
 
     private final HomeServiceImpl homeService;
 
-
-    //TODO: change response type to select info
-
     @GetMapping("/all")
     @ResponseBody
-    public ResponseEntity<List<Home>> getHomes() {
-        return ResponseEntity.ok(homeService.findAll());
+    public ResponseEntity<List<HomeDto>> getHomes() {
+        List<HomeDto> homeDtos =
+                homeService.findAll()
+                        .stream()
+                        .map(MapperDTO::homeToHomeDto)
+                        .toList();
+
+        return ResponseEntity.ok(homeDtos);
     }
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<Home> createHome(@RequestBody CreateHomeDto createHomeDto) {
+    public ResponseEntity<HomeDto> createHome(@RequestBody CreateHomeDto createHomeDto) {
         Home newHome = homeService.create(createHomeDto);
-        return newHome != null ?
-                ResponseEntity.ok(newHome) :
-                ResponseEntity.badRequest().build();
+        if (newHome == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        HomeDto homeDto = MapperDTO.homeToHomeDto(newHome);
+        return ResponseEntity.ok(homeDto);
     }
 
     @PatchMapping("/{homeId}")
@@ -68,37 +75,47 @@ public class HomeController {
 
     @GetMapping("/{homeId}")
     @ResponseBody
-    public ResponseEntity<Home> getHome(@PathVariable Long homeId) {
+    public ResponseEntity<HomeDto> getHome(@PathVariable Long homeId) {
         Home home = homeService.getDetails(homeId);
         return home != null ?
-                ResponseEntity.ok(home) :
+                ResponseEntity.ok(MapperDTO.homeToHomeDto(home)) :
                 ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/owner/{ownerId}")
     @ResponseBody
-    public ResponseEntity<List<Home>> getHomeByOwner(@PathVariable Long ownerId) {
-        List<Home> ownerHomes = homeService.findByOwnerId(ownerId);
+    public ResponseEntity<List<HomeDto>> getHomeByOwner(@PathVariable Long ownerId) {
+
+        List<HomeDto> ownerHomesDto = homeService.findByOwnerId(ownerId)
+                .stream().map(MapperDTO::homeToHomeDto)
+                .toList();
+
         // TODO: need to change Home to dto
-        return ownerHomes.isEmpty() ?
+        return ownerHomesDto.isEmpty() ?
                 ResponseEntity.badRequest().build() :
-                ResponseEntity.ok(ownerHomes);
+                ResponseEntity.ok(ownerHomesDto);
     }
 
     @GetMapping("/{city}")
     @ResponseBody
-    public ResponseEntity<List<Home>> getHomeByCity(@PathVariable String city) {
-        List<Home> homeList = homeService.findByCity(city);
-        return homeList.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(homeList);
+    public ResponseEntity<List<HomeDto>> getHomeByCity(@PathVariable String city) {
+        List<HomeDto> homeDtos = homeService.findByCity(city)
+                .stream().map(MapperDTO::homeToHomeDto)
+                .toList();
+
+        return homeDtos.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(homeDtos);
     }
 
     @GetMapping("/{availability}")
     @ResponseBody
-    public ResponseEntity<List<Home>> getHomeByAvailability(@PathVariable boolean availability) {
-        List<Home> homeList = homeService.findByAvailability(availability);
-        return homeList.isEmpty() ?
+    public ResponseEntity<List<HomeDto>> getHomeByAvailability(@PathVariable boolean availability) {
+        List<HomeDto> homeDtos = homeService.findByAvailability(availability)
+                .stream().map(MapperDTO::homeToHomeDto)
+                .toList();
+
+        return homeDtos.isEmpty() ?
                 ResponseEntity.badRequest().build() :
-                ResponseEntity.ok(homeList);
+                ResponseEntity.ok(homeDtos);
     }
 
 

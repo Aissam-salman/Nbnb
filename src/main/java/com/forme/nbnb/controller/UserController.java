@@ -3,17 +3,14 @@ package com.forme.nbnb.controller;
 import com.forme.nbnb.dto.LoginRequest;
 import com.forme.nbnb.dto.LoginResponse;
 import com.forme.nbnb.dto.RegisterDto;
-import com.forme.nbnb.entity.Provider;
-import com.forme.nbnb.entity.user.Role;
+import com.forme.nbnb.dto.UserDto;
 import com.forme.nbnb.entity.user.User;
+import com.forme.nbnb.mapper.MapperDTO;
 import com.forme.nbnb.security.token.JwtService;
 import com.forme.nbnb.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,49 +22,34 @@ public class UserController {
     private final UserDetailsServiceImpl userService;
     private final JwtService jwtService;
 
+
     @GetMapping("/user-info")
     @ResponseBody
     public ResponseEntity<?> userInfo(@AuthenticationPrincipal Object principal) {
-
-        // with google
         if (principal instanceof OAuth2User oauth2User) {
 
             String email = oauth2User.getAttribute("email");
             User user = userService.getByEmail(email);
+
             if (user != null) {
                 return ResponseEntity.ok(user);
             }
 
-
-            String firstname = oauth2User.getAttribute("given_name");
-            String lastname = oauth2User.getAttribute("family_name");
-            String id = oauth2User.getAttribute("sub");
-            String picture = oauth2User.getAttribute("picture") != null ? oauth2User.getAttribute("picture") : null;
-
-
-            User newUser = User.builder()
-                    .firstname(firstname)
-                    .lastname(lastname)
-                    .email(email)
-                    .oauth2Id(id)
-                    .oauth2Provider(Provider.google)
-                    .picture(picture)
-                    .role(Role.USER)
-                    .build();
-
-            userService.createUserProvider(newUser);
+            User newUser = userService.createUserFromProvider(oauth2User, email);
 
             return ResponseEntity.ok(newUser);
 
-        } else if (principal instanceof UserDetails userDetails) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        } else {
 
-            User currentUser = (User) authentication.getPrincipal();
+            UserDto userDto = MapperDTO.currentUserToUserDto();
 
-            return ResponseEntity.ok(currentUser);
+            if (userDto == null) {
+                return ResponseEntity.badRequest().body("Error creating user");
+            }
+
+            return ResponseEntity.ok(userDto);
+
         }
-
-        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/signup")
@@ -91,6 +73,20 @@ public class UserController {
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getJwtExpirationTime());
 
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("/role/{roleName}")
+    @ResponseBody
+    public ResponseEntity<?> role(@PathVariable String roleName) {
+        UserDto userDto = MapperDTO.currentUserToUserDto();
+
+        assert userDto != null;
+        boolean update = userService.updateRole(userDto.getId(), roleName);
+
+        if (update) {
+            return ResponseEntity.ok(userDto);
+        }
+        return ResponseEntity.badRequest().body("Error updating role");
     }
 
 }

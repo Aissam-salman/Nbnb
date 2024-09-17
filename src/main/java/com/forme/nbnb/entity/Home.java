@@ -17,8 +17,9 @@ import java.util.List;
 public class Home {
     @Id
     @GeneratedValue
-    private long id;
+    private Long id;
     private String address;
+
     //TODO : transform address to entity
     private String city;
 
@@ -26,11 +27,13 @@ public class Home {
     private Float pricePerNight;
     private boolean availability;
     private boolean archived;
+    
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private Owner owner;
 
-    @OneToMany(mappedBy = "home")
+
+    @OneToMany(mappedBy = "home", fetch = FetchType.LAZY)
     private List<Booking> booking;
 }

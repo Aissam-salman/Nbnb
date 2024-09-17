@@ -2,6 +2,7 @@ package com.forme.nbnb.service;
 
 import com.forme.nbnb.dto.LoginRequest;
 import com.forme.nbnb.dto.RegisterDto;
+import com.forme.nbnb.entity.Provider;
 import com.forme.nbnb.entity.user.Role;
 import com.forme.nbnb.entity.user.User;
 import com.forme.nbnb.repository.user.UserRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,10 +38,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public User getByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Not found: " + email));
-    }
-
-    public User createUserProvider(User user) {
-        return userRepository.save(user);
     }
 
     public User createUserClassic(RegisterDto user) {
@@ -67,5 +65,34 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
         return userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new UsernameNotFoundException("Not found: " + loginRequest.getEmail()));
+    }
+
+    public User createUserFromProvider(OAuth2User oauth2User, String email) {
+        User newUser = User.builder()
+                .firstname(oauth2User.getAttribute("given_name"))
+                .lastname(oauth2User.getAttribute("family_name"))
+                .email(email)
+                .oauth2Id(oauth2User.getAttribute("sub"))
+                .oauth2Provider(Provider.google)
+                .picture(oauth2User.getAttribute("picture") != null ? oauth2User.getAttribute("picture") : null)
+                .role(Role.USER)
+                .build();
+
+
+        return userRepository.save(newUser);
+    }
+
+    public boolean updateRole(Long id, String role) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Not found: " + id));
+
+        //FIX: maybe change user to Role entity
+
+        try {
+            user.setRole(Role.valueOf(role));
+            userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

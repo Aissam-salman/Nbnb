@@ -34,12 +34,13 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/login").permitAll()
                                 .requestMatchers("/api/v1/user-info").authenticated()
                                 .requestMatchers("/oauth2/authorization/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated()
 
                 )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .oauth2Login(oauth2 ->
                         oauth2.defaultSuccessUrl("http://localhost:5173/home", true)

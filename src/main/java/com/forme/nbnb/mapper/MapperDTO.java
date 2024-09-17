@@ -39,7 +39,8 @@ public class MapperDTO {
                 home.getPricePerNight(),
                 home.isAvailability(),
                 home.isArchived(),
-                home.getOwner().getId()
+                home.getOwner().getId(),
+                home.getImages()
         );
     }
 }

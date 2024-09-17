@@ -27,7 +27,9 @@ public class Home {
     private Float pricePerNight;
     private boolean availability;
     private boolean archived;
-    
+
+    @OneToMany(mappedBy = "home", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")

@@ -1,8 +1,11 @@
 package com.forme.nbnb.dto;
 
+import com.forme.nbnb.entity.Image;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,4 +19,10 @@ public class HomeDto {
     private boolean availability;
     private boolean archived;
     private Long ownerId;
+
+    private List<Image> imageUrls;
+
+    public List<String> getImageUrls() {
+        return imageUrls.stream().map(Image::getUrl).toList();
+    }
 }

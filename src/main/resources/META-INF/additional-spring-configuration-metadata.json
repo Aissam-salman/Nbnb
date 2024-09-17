@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "cloudinary.url",
+      "type": "java.lang.String",
+      "description": "storage for image"
+    }
+  ]
+}

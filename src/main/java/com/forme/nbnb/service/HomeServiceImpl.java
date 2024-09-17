@@ -3,6 +3,7 @@ package com.forme.nbnb.service;
 import com.forme.nbnb.dto.CreateHomeDto;
 import com.forme.nbnb.dto.UpdateHomeDto;
 import com.forme.nbnb.entity.Home;
+import com.forme.nbnb.entity.Image;
 import com.forme.nbnb.entity.user.Owner;
 import com.forme.nbnb.repository.HomeRepository;
 import com.forme.nbnb.repository.user.OwnerRepository;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.HibernateException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -100,6 +102,24 @@ public class HomeServiceImpl implements IHome {
     @Override
     public Home getDetails(Long id) {
         return homeRepository.findById(id).orElseThrow(() -> new RuntimeException("Home not found"));
+    }
+
+    public void addImages(Long id, List<String> imageUrls) {
+        Home home = homeRepository.findById(id).orElseThrow(() -> new RuntimeException("Home not found"));
+
+        List<Image> images = new ArrayList<Image>();
+        for (String imageUrl : imageUrls) {
+            Image image = Image.builder()
+                    .home(home)
+                    .url(imageUrl)
+                    .build();
+
+            images.add(image);
+        }
+
+        home.setImages(images);
+
+        homeRepository.save(home);
     }
 
     @Override
